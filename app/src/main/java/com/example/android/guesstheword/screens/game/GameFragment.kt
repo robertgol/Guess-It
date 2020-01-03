@@ -52,13 +52,8 @@ class GameFragment : Fragment() {
 
         viewModel = ViewModelProviders.of(this).get(GameViewModel::class.java)
 
-        viewModel.scoreData.observe(this, Observer {
-            updateScoreText(it)
-        })
-
-        viewModel.wordData.observe(this, Observer {
-            updateWordText(it)
-        })
+        binding.gameViewModel = viewModel
+        binding.lifecycleOwner = this
 
         viewModel.secondUntilFinishedData.observe(this, Observer {
             binding.timerText.text = DateUtils.formatElapsedTime(it)
@@ -70,13 +65,6 @@ class GameFragment : Fragment() {
                 viewModel.onGameFinishComplete()
             }
         })
-
-        binding.correctButton.setOnClickListener {
-            viewModel.onCorrect()
-        }
-        binding.skipButton.setOnClickListener {
-            viewModel.onSkip()
-        }
 
         return binding.root
     }
