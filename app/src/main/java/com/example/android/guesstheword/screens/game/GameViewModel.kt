@@ -37,13 +37,15 @@ class GameViewModel : ViewModel() {
     val eventGameFinish: LiveData<Boolean>
         get() = _eventGameFinish
 
-    private val _secondsUntilFinishedData = MutableLiveData<Long>()
-    val secondUntilFinishedData: LiveData<Long>
-        get() = _secondsUntilFinishedData
+    private val secondsUntilFinishedData = MutableLiveData<Long>()
 
-    val secondUntilFinishedStringData = Transformations.map(secondUntilFinishedData) {
+    val secondUntilFinishedStringData = Transformations.map(secondsUntilFinishedData) {
         DateUtils.formatElapsedTime(it)
     }
+
+    private val _eventBuzz = MutableLiveData(BuzzType.NO_BUZZ)
+    val eventBuzz: LiveData<BuzzType>
+        get() = _eventBuzz
 
     // The list of words - the front of the list is the next word to guess
     private lateinit var wordList: MutableList<String>
@@ -60,11 +62,15 @@ class GameViewModel : ViewModel() {
     private fun setupTimer() {
         timer = object : CountDownTimer(COUNTDOWN_TIME, ONE_SECOND) {
             override fun onFinish() {
+                _eventBuzz.value = BuzzType.GAME_OVER
                 _eventGameFinish.value = true
             }
 
             override fun onTick(millisUntilFinished: Long) {
-                _secondsUntilFinishedData.value = millisUntilFinished / 1000
+                secondsUntilFinishedData.value = millisUntilFinished / 1000
+                if (millisUntilFinished / 1000 < 5) {
+                    _eventBuzz.value = BuzzType.COUNTDOWN_PANIC
+                }
             }
         }
     }
@@ -110,11 +116,16 @@ class GameViewModel : ViewModel() {
     }
 
     fun onCorrect() {
+        _eventBuzz.value = BuzzType.CORRECT
         _scoreData.value = (scoreData.value)?.plus(1)
         nextWord()
     }
 
     fun onGameFinishComplete() {
         _eventGameFinish.value = false
+    }
+
+    fun onBuzzComplete() {
+        _eventBuzz.value = BuzzType.NO_BUZZ
     }
 }
