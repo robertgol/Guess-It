@@ -59,6 +59,13 @@ class GameFragment : Fragment() {
             updateWordText(it)
         })
 
+        viewModel.eventGameFinish.observe(this, Observer {
+            if (it) {
+                gameFinished()
+                viewModel.onGameFinishComplete()
+            }
+        })
+
         binding.correctButton.setOnClickListener {
             viewModel.onCorrect()
         }
