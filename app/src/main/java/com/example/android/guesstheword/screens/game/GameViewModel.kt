@@ -1,8 +1,10 @@
 package com.example.android.guesstheword.screens.game
 
 import android.os.CountDownTimer
+import android.text.format.DateUtils
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 
 class GameViewModel : ViewModel() {
@@ -38,6 +40,10 @@ class GameViewModel : ViewModel() {
     private val _secondsUntilFinishedData = MutableLiveData<Long>()
     val secondUntilFinishedData: LiveData<Long>
         get() = _secondsUntilFinishedData
+
+    val secondUntilFinishedStringData = Transformations.map(secondUntilFinishedData) {
+        DateUtils.formatElapsedTime(it)
+    }
 
     // The list of words - the front of the list is the next word to guess
     private lateinit var wordList: MutableList<String>
